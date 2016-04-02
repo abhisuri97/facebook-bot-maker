@@ -29,6 +29,7 @@
     "cookie-session": "^1.2.0",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
+    "express-handlebars": "^3.0.0",
     "node-uuid": "^1.4.7"
   },
   "devDependencies": {}
