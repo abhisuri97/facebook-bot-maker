@@ -1,6 +1,5 @@
 var weather = require('weather-js');
 
-
 var parseWeatherData = function (data) {
   data = data[0];
   return 'It is ' + data.current.temperature + ' degrees and ' + data.current.skytext + ' in ' + data.location.name + '.';
