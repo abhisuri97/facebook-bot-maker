@@ -10,7 +10,8 @@ var userSchema = mongoose.Schema({
     token     : String,
     email     : String,
     name      : String,
-    password  : String
+    password  : String,
+    bots      : String
   },
 
 
