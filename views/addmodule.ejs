@@ -1,0 +1,62 @@
+<!-- views/signup.ejs -->
+<!doctype html>
+<html>
+<head>
+    <title>Node Authentication</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <style>
+        body        { padding-top:80px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<div class="col-sm-6 col-sm-offset-3">
+    <% if (message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+     <% if (success.length > 0) { %>
+        <div class="alert alert-success"><%= success %></div>
+    <% } %>
+    <p>Return to <a href="/profile">home</a></p>
+
+    <h1><span class="fa fa-sign-in"></span> Add a Trigger</h1>
+
+    <form action="/add-trigger" method="post">
+        <div class="form-group">
+            <label>Trigger Name</label>
+            <input type="text" class="form-control" name="name">
+        </div>
+        <div class="form-group">
+            <label>Trigger Call</label>
+            <p>The in-chat event or phrase which will trigger this to work (e.g. typing "/weather")</p>
+            <input type="text" class="form-control" name="call">
+        </div>
+        <div class="form-group">
+            <label>Trigger Description</label>
+            <p>What will be outputted when you type in your trigger name followed by -help (e.g. "/weather-help") </p>
+            <input type="textarea" class="form-control" name="desc">
+        </div>
+        <div class="form-group">
+            <label>Trigger Type</label>
+            <select class="form-control" name="type"> 
+                <option value="chat">Inside messenger chat</option>
+                <option value="web">Web request</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Trigger Parameters</label>
+            <p>Separate the trigger parameters by commas (e.g. city name, first name)</p>
+            <input type="text" class="form-control" name="params">
+        </div>
+
+        <button type="submit" class="btn btn-warning btn-lg">Add Trigger</button>
+    </form>
+
+</div>
+
+</div>
+</body>
+</html>

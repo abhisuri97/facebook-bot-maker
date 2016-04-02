@@ -1,4 +1,6 @@
-module.exports = function(app, passport) {
+var User = require('../app/models/user');
+
+module.exports = function(app, passport, trigger) {
   app.get('/', function(req, res) {
     res.render('index.ejs');
   });
@@ -20,6 +22,43 @@ module.exports = function(app, passport) {
     });
   });
 
+  // app.get('/add-trigger', isLoggedIn, function(req, res) {
+  //   res.render('addmodule.ejs', {
+  //     user: req.user,
+  //     message: req.flash('triggerMessage'),
+  //     success: req.flash('triggerMessageSuccess')
+  //   });
+  // });
+
+  // app.post('/add-trigger', isLoggedIn, function(req, res) {
+  //   trigger(req, req.body, function(err, pass, trigger) {
+  //     if (err || (pass === false)) {
+  //       res.redirect('/add-trigger');
+  //     } else {
+  //       res.redirect('/add-trigger');
+  //     }
+  //   });
+  // });
+
+
+  app.get('/add-action', isLoggedIn, function(req, res) {
+    res.render('addaction.ejs', {
+      user: req.user,
+      message: req.flash('triggerMessage'),
+      success: req.flash('triggerMessageSuccess')
+    });
+  });
+
+  app.post('/add-action', isLoggedIn, function(req, res) {
+    trigger(req, req.body, function(err, pass, trigger) {
+      if (err || (pass === false)) {
+        res.redirect('/add-action');
+      } else {
+        res.redirect('/add-action');
+      }
+    });
+  });
+
   app.get('/logout', function(req, res) {
     req.logout();
     res.redirect('/');
@@ -33,11 +72,28 @@ module.exports = function(app, passport) {
       failureRedirect : '/'
     }));
 
-  app.post('/signup', passport.authenticate('local-signup', {
-    successRedirect: '/profile',
-    failureRedirect: '/signup',
-    failureFlash: true
-  }));
+  app.post('/signup', function(req, res) {
+    User.findOne({
+      'facebook.email' : req.body.email
+    }, function(err, user) {
+      console.log(req.body.email)
+      if(err || !user) {
+        return res.redirect('/signup')
+      }
+      console.log(user);
+      console.log(req.body.password);
+      user.facebook.password = req.body.password;
+      user.save(function(err) {
+            if(err)  {
+              return res.redirect('/');
+            }
+            else {
+              return res.redirect('/profile');
+          }
+      });
+    });
+  });
+  
 
   app.post('/login', passport.authenticate('local-login', {
     successRedirect: '/profile',

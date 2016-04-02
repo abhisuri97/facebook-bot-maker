@@ -1,0 +1,146 @@
+<!-- views/signup.ejs -->
+<!doctype html>
+<html>
+<head>
+    <title>Node Authentication</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <style>
+        body        { padding-top:80px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<div class="col-sm-6 col-sm-offset-3">
+<% if (message.length > 0) { %>
+        <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+     <% if (success.length > 0) { %>
+        <div class="alert alert-success"><%= success %></div>
+    <% } %>
+    <p>Return to <a href="/profile">home</a></p>
+
+    <h1><span class="fa fa-sign-in"></span> Add a Trigger</h1>
+
+    <form action="/add-action" method="post">
+        <div class="form-group">
+            <label>Trigger Name</label>
+            <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <div class="form-group">
+            <label>Trigger Call</label>
+            <p>The in-chat event or phrase which will trigger this to work (e.g. typing "/weather")</p>
+            <input type="text" class="form-control" id="call" name="call">
+        </div>
+        <div class="form-group">
+            <label>Trigger Description</label>
+            <p>What will be outputted when you type in your trigger name followed by -help (e.g. "/weather-help") </p>
+            <input type="textarea" class="form-control" name="desc">
+        </div>
+        <div class="form-group">
+            <label>Trigger Type</label>
+            <select class="form-control" name="type"> 
+                <option value="chat">Inside messenger chat</option>
+                <option value="web">Web request</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Trigger Parameters</label>
+            <p>You can use parameters specified above in the following fields.</p>
+            <input type="text" class="form-control" id="params" name="params">
+        </div>
+    <h3>This is what you will call to trigger the action: </h3>
+    <b style='font-size: 20px'><span class="call" style="background-color: #F79E21">No Input</span><span style="padding-right:10px"></span><span class="params"></span></b>
+
+    <h1><span class="fa fa-sign-in"></span> Add an Action</h1>
+        <div class="form-group">
+            <label>Action Code</label>
+            <p>Separate the trigger parameters by commas (e.g. city name, first name)</p>
+            <div class="checkbox">
+                <label><input type="checkbox" name="optradio" id="web" value="web">Request web URL and send response to chat</label>
+            </div>
+            <div id="urlspec" style="display:none"> 
+                <div class="form-group">
+                <label>URL endpoint to send to (use [param] to refer to parameters stated above):</label>
+                    <input type="text" class="form-control" name="url" id="url">
+                </div>
+                <div class="form-group">
+                    <label>Type of Request:</label>
+                    <select class="form-control" name="req_type" id="type"> 
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                    Default type is Application/JSON
+                </div>
+                <div class="form-group">
+                    <label>Body of Request:</label>
+                    <textarea class="form-control" rows="5" name="body" id="body"></textarea>
+                </div>
+                <div class="form-group">
+                <label>JSON Selector:</label>
+                    <input type="text" class="form-control" name="select" id="select" value="json">
+                </div>
+                <button class="btn btn-primary" id="test">Test</button>
+                <p id="output"></p>
+            </div>
+            <div class="form-group">
+                <label>Send Message to group (use '[RESPONSE]' to refer to the result from the URL call):</label>
+                <input type="text" class="form-control" name="optradio">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-warning btn-lg">Add Trigger</button>
+    </form>
+
+</div>
+
+</div>
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"   integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="   crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css"></script>
+<script>
+
+$(document).ready(function() {
+    $('#call').keyup( function() {
+        $('.call').text($('#call').val());
+    });
+    $('#params').keyup(function() {
+        var arr = $('#params').val().split(' ');
+        var str = ""
+        for(var a in arr) {
+            str += '<span style="background-color: #ADD8E6">'+ arr[a] + '</span><span style="padding-right:10px"></span>'
+        }
+        $('.params').html(str);
+    });
+    $('#web').click(function() {
+        $('#urlspec').toggle(this.checked);
+    })
+   $('#test').click(function(e) {
+        e.preventDefault();
+        var url = $('#url').val();
+        var type = $('#type').val();
+        var body = $('#body').val();
+        var selector = $('#select').val();
+        console.log(selector)
+        $.ajax({
+         url: url,
+         dataType: 'jsonp', // Notice! JSONP <-- P (lowercase)
+         success:function(json){
+             // do stuff with json (in this case an array)
+            console.log('hi');
+            if(json) {
+                $('#output').html(JSON.stringify(eval(selector)));
+            }
+         },
+         error:function(){
+             // @SUPPRESS ALL WARNINGS
+         }      
+      });
+   })
+});
+
+</script>
+</body>
+</html>
