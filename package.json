@@ -25,12 +25,15 @@
   },
   "homepage": "https://github.com/abhisuri97/facebook-bot-maker#readme",
   "dependencies": {
+    "bluebird": "^3.3.4",
     "body-parser": "^1.15.0",
     "cookie-session": "^1.2.0",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",
     "facebook-chat-api": "^1.0.8",
+    "flutter": "0.0.5",
+    "node-twitter-api": "^1.7.0",
     "node-uuid": "^1.4.7",
     "twitter": "^1.2.5"
   },
