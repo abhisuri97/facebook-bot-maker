@@ -66,10 +66,12 @@ module.exports = function(passport) {
     clientID : configAuth.facebookAuth.clientID,
     clientSecret : configAuth.facebookAuth.clientSecret,
     callbackURL : configAuth.facebookAuth.callbackURL,
+    passReqToCallback : true,
     profileFields: ['id', 'name', 'photos', 'emails']
   }, 
-  function(token, refreshToken, profile, done) {
+  function(req, token, refreshToken, profile, done) {
     process.nextTick(function() {
+      if(!req.user) {
       User.findOne({ 'facebook.id' : profile.id} , function (err, user) {
         if (err)
           return done(err);
@@ -86,8 +88,21 @@ module.exports = function(passport) {
               throw err;
             return done(null, newUser);
           });
-        }
+        } 
       });
+    } else {
+          var user = req.user;
+          user.facebook.id = profile.id;
+          user.facebook.token = token;
+          user.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
+          user.facebook.email = profile.emails[0].value
+
+          user.save(function(err) {
+            if (err)
+              throw err;
+            return done(null, user);
+          });
+        }
     });
   }));
 };

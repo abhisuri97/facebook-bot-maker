@@ -8,7 +8,6 @@ module.exports = function(app, passport) {
       message: req.flash('loginMessage')
     });
   });
-
   app.get('/signup', function(req, res) {
     res.render('signup.ejs', {
       message: req.flash('signupMessage')
