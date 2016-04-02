@@ -1,4 +1,5 @@
 var User = require('../app/models/user');
+var Recipe = require('../app/models/recipes');
 
 module.exports = function(app, passport, trigger) {
   app.get('/', function(req, res) {
@@ -17,29 +18,13 @@ module.exports = function(app, passport, trigger) {
   });
 
   app.get('/profile', isLoggedIn, function(req, res) {
-    res.render('profile.ejs', {
-      user: req.user
-    });
+    Recipe.find({}, function(err, recipes) {
+      res.render('profile.ejs', {
+        user: req.user,
+        bots: recipes
+      })
+    })
   });
-
-  // app.get('/add-trigger', isLoggedIn, function(req, res) {
-  //   res.render('addmodule.ejs', {
-  //     user: req.user,
-  //     message: req.flash('triggerMessage'),
-  //     success: req.flash('triggerMessageSuccess')
-  //   });
-  // });
-
-  // app.post('/add-trigger', isLoggedIn, function(req, res) {
-  //   trigger(req, req.body, function(err, pass, trigger) {
-  //     if (err || (pass === false)) {
-  //       res.redirect('/add-trigger');
-  //     } else {
-  //       res.redirect('/add-trigger');
-  //     }
-  //   });
-  // });
-
 
   app.get('/add-action', isLoggedIn, function(req, res) {
     res.render('addaction.ejs', {
@@ -59,6 +44,44 @@ module.exports = function(app, passport, trigger) {
     });
   });
 
+  app.get('/add-bot/:number', isLoggedIn, function(req, res) {
+    User.findOne({
+      'facebook.email' : req.user.facebook.email
+    }, function(err, user) {
+      if(err) {
+        console.log(err);
+        res.redirect('/profile');
+      }
+      var temp = user.facebook.bots;
+      var finalString = req.params.number + ',' + temp
+      user.facebook.bots = finalString
+      user.save(function(err) {
+        if(err) {
+          res.redirect('/profile');
+        }
+        res.redirect('/profile')
+      });
+    })
+  });
+  app.get('/remove-bot/:number', isLoggedIn, function(req, res) {
+    User.findOne({
+      'facebook.email' : req.user.facebook.email
+    }, function(err, user) {
+      if(err) {
+        console.log(err);
+        res.redirect('/profile');
+      }
+      var temp = user.facebook.bots;
+      var finalString = temp.replace(req.params.number, '')
+      user.facebook.bots = finalString
+      user.save(function(err) {
+        if(err) {
+          res.redirect('/profile');
+        }
+        res.redirect('/profile')
+      });
+    })
+  });
   app.get('/logout', function(req, res) {
     req.logout();
     res.redirect('/');

@@ -21,7 +21,7 @@
     <div class="row">
 
         <!-- LOCAL INFORMATION -->
-        <div class="col-sm-6">
+        <div class="col-sm-12">
             <div class="well">
                 <h3 class="text-primary"><span class="fa fa-facebook"></span> Facebook</h3>
                     <p>
@@ -33,7 +33,28 @@
                     </p>
 
             </div>
+            <div class="col-sm-6">
+            <h3>All Bots</h3>
+            <% for(var i = 0; i < bots.length; ++i) { %>
+            <ul>
+                <li><b>Name</b>: <%= bots[i].name %></li>
+                <li><b>Description</b>: <%= bots[i].desc %></li>
+                <li><b>Add Bot</b>: <a href="/add-bot/<%= bots[i]._id %>">Add bot</a></li>
+            </ul>
+            <% } %>
+            </div>
+            <div class="col-sm-6">
+            <h3>Your Bots</h3>
+            <% for(var i = 0; i < bots.length; ++i) { %>
+            <ul>
+                <li><b>Name</b>: <%= bots[i].name %></li>
+                <li><b>Description</b>: <%= bots[i].desc %></li>
+                <li><b>Add Bot</b>: <a href="/remove-bot/<%= bots[i]._id %>">Remove bot</a></li>
+            </ul>
+            <% } %>
+            </div>
         </div>
+        
 
     </div>
 
