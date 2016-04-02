@@ -1,19 +1,17 @@
 var express = require('express');
+var exphbs  = require('express-handlebars');
 
 var app = express();
+// Serve static pages
+
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
 
 app.get('/', function (req, res) {
-  res.render('index');
+  res.render('home', {
+    appName: 'This is my App'
+  });
 });
-// Serve static pages
-app.engine('html', require('ejs').__express);
-app.set('view engine', 'html');
-app.use(express.static(__dirname + '/public'));
-
-// Generate a random cookie secret for this app
-var generateCookieSecret = function () {
-  return 'iamasecret' + uuid.v4();
-};
 
 app.set('port', process.env.PORT || 3000);
 
