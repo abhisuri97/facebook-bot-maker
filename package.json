@@ -30,7 +30,9 @@
     "ejs": "^2.4.1",
     "express": "^4.13.4",
     "express-handlebars": "^3.0.0",
-    "node-uuid": "^1.4.7"
+    "facebook-chat-api": "^1.0.8",
+    "node-uuid": "^1.4.7",
+    "twitter": "^1.2.5"
   },
   "devDependencies": {}
 }
