@@ -1,20 +1,33 @@
-var express = require('express');
-var exphbs  = require('express-handlebars');
+var express   = require('express');
+var app       = express();
+var port      = process.env.PORT || 8080;
+var mongoose  = require('mongoose');
+var passport  = require('passport');
+var flash     = require('connect-flash');
+var morgan    = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require ('body-parser');
+var session = require('express-session');
 
-var app = express();
-// Serve static pages
+var configDB = require('./config/database.js');
+require('./config/passport')(passport);
 
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
-app.set('view engine', 'handlebars');
+mongoose.connect(configDB.url);
 
-app.get('/', function (req, res) {
-  res.render('home', {
-    appName: 'This is my App'
-  });
-});
+app.use(morgan('dev'));
+app.use(cookieParser());
+app.use(bodyParser());
 
-app.set('port', process.env.PORT || 3000);
+app.set('view engine', 'ejs');
 
-var server = app.listen(app.get('port'), function () {
-  console.log('Express server listening on port %d', server.address().port);
-});
+app.use(session({
+  secret: 'cis197rocks'
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+require('./app/routes.js')(app, passport);
+
+app.listen(port);
+console.log('ITS HAPPENING (on port ' + port);

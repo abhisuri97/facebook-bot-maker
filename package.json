@@ -1,35 +1,22 @@
 {
-  "name": "facebook-bot-maker",
-  "version": "1.0.0",
-  "description": "A tool to add functionality to your facebook bots",
+  "name": "node-authentication",
   "main": "server.js",
-  "scripts": {
-    "test": "npm start",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/abhisuri97/facebook-bot-maker.git"
-  },
-  "keywords": [
-    "facebook",
-    "messenger",
-    "chat",
-    "bots",
-    "automation"
-  ],
-  "author": "Abhinav Suri, Jared Winograd, Emmett Neyman, Derrick Duncan",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/abhisuri97/facebook-bot-maker/issues"
-  },
-  "homepage": "https://github.com/abhisuri97/facebook-bot-maker#readme",
-  "dependencies": {
-    "body-parser": "^1.15.0",
-    "cookie-session": "^1.2.0",
-    "express": "^4.13.4",
-    "express-handlebars": "^3.0.0",
-    "node-uuid": "^1.4.7"
-  },
-  "devDependencies": {}
+  "dependencies" : {
+    "express" : "~4.0.0",           
+    "ejs" : "~0.8.5",               
+    "mongoose" : "latest",          
+    "passport" : "~0.1.17",         
+    "passport-local" : "~0.1.6",    
+    "passport-facebook" : "~1.0.2", 
+    "passport-twitter" : "~1.0.2",  
+    "passport-google-oauth" : "~0.1.5",
+    "connect-flash" : "~0.1.1",     
+    "bcrypt-nodejs" : "latest",
+
+    "morgan": "~1.0.0",
+    "body-parser": "~1.0.0",
+    "cookie-parser": "~1.0.0",
+    "method-override": "~1.0.0",
+    "express-session": "~1.0.0"     
+  }
 }
