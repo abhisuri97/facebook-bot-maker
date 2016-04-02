@@ -16,34 +16,7 @@ module.exports = function(passport) {
     });
   });
 
-  passport.use('local-signup', new LocalStrategy({
-    usernameField : 'email',
-    passwordField : 'password',
-    passReqToCallback : true
-  },
-  function(req, email, password, done) {
-    process.nextTick(function() {
-      User.findOne({
-        'local.email' : email
-      }, function(err, user) {
-        if (err)
-          return done(err);
-        if (user) {
-          return done(null, false, req.flash('signupMessage', 'Email is taken'))
-        } else {
-          var newUser = new User();
-          newUser.local.email = email;
-          newUser.local.password = newUser.generateHash(password);
-
-          newUser.save(function(err) {
-            if(err)
-              throw err;
-            return done(null, newUser);
-          });
-        }
-      });
-    });
-  }));
+  
 
   passport.use('local-login', new LocalStrategy({
     usernameField : 'email',
@@ -82,7 +55,8 @@ module.exports = function(passport) {
           newUser.facebook.id = profile.id;
           newUser.facebook.token = token;
           newUser.facebook.name = profile.name.givenName  + ' ' + profile.name.familyName;
-          newUser.facebook.email = profile.emails[0].value // facebook can return multiple emails so we'll take the first
+          newUser.facebook.email = profile.emails[0].value; // facebook can return multiple emails so we'll take the first
+          newUser.facebook.password = ""; // facebook can return multiple emails so we'll take the first
           newUser.save(function(err) {
             if(err) 
               throw err;

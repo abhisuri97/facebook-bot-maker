@@ -11,6 +11,7 @@ var session = require('express-session');
 
 var configDB = require('./config/database.js');
 require('./config/passport')(passport);
+var trigger  = require('./config/trigger');
 
 mongoose.connect(configDB.url);
 
@@ -27,7 +28,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-require('./app/routes.js')(app, passport);
+require('./app/routes.js')(app, passport, trigger);
 
 app.listen(port);
 console.log('ITS HAPPENING (on port ' + port);
