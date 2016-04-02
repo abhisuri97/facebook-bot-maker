@@ -1,68 +1,59 @@
-var Twitter = require('node-twitter-api');
-var secret = require('./secret.json');
 var express = require('express');
-var exphbs = require('express-handlebars');
-
 var app = express();
+var port = process.env.PORT || 8080;
 
-app.engine('handlebars', exphbs({
-  defaultLayout: 'main'
-}));
+// fb stuff
+var config = require('./config.json');
+var login = require('facebook-chat-api');
 
-app.set('view engine', 'handlebars');
+// bots
+var weatherBot = require('./bots/weather');
+var newsBot = require('./bots/news');
+var depressionBot = require('./bots/depression');
 
-var twitter = new Twitter({
-  consumerKey: secret.twitter.consumer_key,
-  consumerSecret: secret.twitter.consumer_secret,
-  callback: secret.twitter.callback_URL
-});
+login({
+  email: config.username,
+  password: config.password
+}, function callback(err, api) {
+  if (err) return console.error(err);
 
-var _requestSecret;
-app.get('/request-token', function(req, res) {
-  twitter.getRequestToken(function(err, requestToken, requestSecret) {
-    if (err) {
-    } else {
-      _requestSecret = requestSecret;
-      res.redirect("https://api.twitter.com/oauth/authenticate?oauth_token=" + requestToken);
-    }
+  api.setOptions({
+    listenEvents: true
   });
-});
 
-app.get("/access-token", function(req, res) {
-  var requestToken = req.query.oauth_token;
-  var verifier = req.query.oauth_verifier;
+  var stopListening = api.listen(function(err, event) {
+    if (err) return console.error(err);
 
-  twitter.getAccessToken(requestToken, _requestSecret, verifier, function(err, accessToken, accessSecret) {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-      console.log("access: " + accessToken);
-      console.log("secret: " + accessSecret);
-      twitter.verifyCredentials(accessToken, accessSecret, function(err, user) {
-        if (err) {
-          res.status(500).send(err);
-        } else {
-          res.send(user);
+    switch (event.type) {
+      case "message":
+
+        if (event.body.startsWith('/weather:')) {
+          var query = event.body.split(':')[1];
+          weatherBot(query, function (result) {
+            api.sendMessage(result, event.threadID);
+          })
+          
         }
-      });
+
+        if (event.body === '/news') {
+          newsBot(query, function (data) {
+            api.sendMessage(data.title, event.threadID);
+          })
+        }
+
+        api.markAsRead(event.threadID, function(err) {
+          if (err) console.log(err);
+        });
+        break;
+
+        /*
+        case "event":
+          console.log(event);
+          break;
+        */
     }
   });
 });
 
-app.get('/redir', function(req, res) {
-  res.render('home', {
-    appName: 'This is my App'
-  });
-});
-
-app.get('/', function(req, res) {
-  res.render('signin');
-})
-
-app.set('port', process.env.PORT || 3000);
-
-
-
-var server = app.listen(app.get('port'), function() {
-  console.log('Express server listening on port %d', server.address().port);
-});
+app.listen(port);
+console.log('ITS HAPPENING (on port ' + port + ')');

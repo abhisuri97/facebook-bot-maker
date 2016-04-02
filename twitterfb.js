@@ -3,21 +3,14 @@
 var config = require('./config.json');
 var login = require('facebook-chat-api');
 var express = require('express');
-var Flutter = require('flutter');
 var Twitter = require('twitter');
+
  
 login({email: config.username, password: "hackprinceton"}, function callback (err, api) {
     if(err) return console.error(err);
  
     api.setOptions({listenEvents: true});
 
-    var client = new Twitter({
-      consumer_key: config.consumer_key,
-      consumer_secret: config.consumer_secret,
-      access_token_key: '716080817836072960-NT3HVHLPMzvcVWhLWhid85nUn86HWl2',
-      access_token_secret: 'SbcjlL2uYeLL0kdFyTdoICJznVhNIEtjz8ZoB3blb6wQQ'
-    });
- 
     var stopListening = api.listen(function(err, event) {
         if(err) return console.error(err);
  

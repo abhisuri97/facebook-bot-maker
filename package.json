@@ -1,8 +1,7 @@
 {
-  "name": "facebook-bot-maker",
-  "version": "1.0.0",
-  "description": "A tool to add functionality to your facebook bots",
+  "name": "node-authentication",
   "main": "server.js",
+<<<<<<< HEAD
   "scripts": {
     "test": "npm start",
     "start": "node server.js"
@@ -39,3 +38,24 @@
   },
   "devDependencies": {}
 }
+=======
+  "dependencies" : {
+    "express" : "~4.0.0",           
+    "ejs" : "~0.8.5",               
+    "mongoose" : "latest",          
+    "passport" : "~0.1.17",         
+    "passport-local" : "~0.1.6",    
+    "passport-facebook" : "~1.0.2", 
+    "passport-twitter" : "~1.0.2",  
+    "passport-google-oauth" : "~0.1.5",
+    "connect-flash" : "~0.1.1",     
+    "bcrypt-nodejs" : "latest",
+
+    "morgan": "~1.0.0",
+    "body-parser": "~1.0.0",
+    "cookie-parser": "~1.0.0",
+    "method-override": "~1.0.0",
+    "express-session": "~1.0.0"     
+  }
+}
+>>>>>>> 5a18717bcac5aefabae2a2a1a097dc48f8db11b8
