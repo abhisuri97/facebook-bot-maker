@@ -15,6 +15,7 @@
     <div class="page-header text-center">
         <h1><span class="fa fa-anchor"></span> Profile Page</h1>
         <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+        <a href="/add-action" class="btn btn-primary btn-sm">Add a Trigger</a> 
     </div>
 
     <div class="row">
@@ -27,7 +28,8 @@
                         <strong>id</strong>: <%= user.facebook.id %><br>
                         <strong>token</strong>: <%= user.facebook.token %><br>
                         <strong>email</strong>: <%= user.facebook.email %><br>
-                        <strong>name</strong>: <%= user.facebook.name %>
+                        <strong>name</strong>: <%= user.facebook.name %><br>
+                        <strong>password</strong>: <%= user.facebook.password %> <a href="/signup">Add your bot password </a>
                     </p>
 
             </div>
