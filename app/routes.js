@@ -4,6 +4,7 @@ var login = require('facebook-chat-api');
 var weatherBot = require('./bots/weather');
 var newsBot = require('./bots/news');
 var depressionBot = require('./bots/depression');
+var tweetBot = require('./bots/tweet');
 var request = require('request');
 var http = require('http');
 var async = require('async');
@@ -302,6 +303,14 @@ module.exports = function(app, passport, trigger) {
                 depressionBot(depressionText, function (data) {
                   api.sendMessage(data, event.threadID);
                 })
+              }
+              if (event.body.startsWith('/tweet ')) {
+                console.log('hi');
+                var query = event.body.split(' ')[1];
+
+                tweetBot(query, function (data, res) {
+                  api.sendMessage(data, event.threadID);
+                }, req);
               }
               api.markAsRead(event.threadID, function(err) {
                 if (err) console.log(err);
