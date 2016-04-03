@@ -105,6 +105,7 @@ passport.use(new TwitterStrategy({
                         // if there is a user id already but no token (user was linked at one point and then removed)
                         if (!user.twitter.token) {
                             user.twitter.token       = token;
+                            user.twitter.tokenSecret = tokenSecret;
                             user.twitter.username    = profile.username;
                             user.twitter.displayName = profile.displayName;
 
@@ -122,6 +123,7 @@ passport.use(new TwitterStrategy({
 
                         newUser.twitter.id          = profile.id;
                         newUser.twitter.token       = token;
+                        newUser.twitter.tokenSecret = tokenSecret;
                         newUser.twitter.username    = profile.username;
                         newUser.twitter.displayName = profile.displayName;
 
@@ -139,6 +141,7 @@ passport.use(new TwitterStrategy({
 
                 user.twitter.id          = profile.id;
                 user.twitter.token       = token;
+                user.twitter.tokenSecret = tokenSecret;
                 user.twitter.username    = profile.username;
                 user.twitter.displayName = profile.displayName;
 
