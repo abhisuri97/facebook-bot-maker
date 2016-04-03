@@ -229,6 +229,10 @@ module.exports = function(app, passport, trigger) {
                     }
                     console.log('PATH:' + path);
                     var spec = str[2];
+                    if(params === "") {
+                      api.sendMessage(recipe.action_type, event.threadID);
+                      break;
+                    }
                     if(url && spec && spec) {
                       if(requestType === 'GET') {
                         http.get({
