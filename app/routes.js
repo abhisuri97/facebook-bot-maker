@@ -188,6 +188,10 @@ module.exports = function(app, passport, trigger) {
               for(var i = 0; i< user.facebook.bots.length; i++) {
                 Recipe.findOne({'_id': user.facebook.bots[i]}, function(err, recipe) {
                   if(event.body.startsWith(recipe.call)) {
+                    if(recipe.params === "") {
+                      api.sendMessage(recipe.action_type, event.threadID);
+                      return;
+                    }
                     var params = [];
                     var query = [];
                     if(recipe.params.length >= 1) {
@@ -229,9 +233,6 @@ module.exports = function(app, passport, trigger) {
                     }
                     console.log('PATH:' + path);
                     var spec = str[2];
-                    if(params === "") {
-                      api.sendMessage(recipe.action_type, event.threadID);
-                    }
                     if(url && spec && spec) {
                       if(requestType === 'GET') {
                         http.get({
