@@ -1,5 +1,9 @@
 var User = require('../app/models/user');
 var Recipe = require('../app/models/recipes');
+var login = require('facebook-chat-api');
+var weatherBot = require('./bots/weather');
+var newsBot = require('./bots/news');
+var depressionBot = require('./bots/depression');
 
 module.exports = function(app, passport, trigger) {
   app.get('/', function(req, res) {
@@ -18,10 +22,30 @@ module.exports = function(app, passport, trigger) {
   });
 
   app.get('/profile', isLoggedIn, function(req, res) {
+    var common = [];
+    var recipesList = [];
     Recipe.find({}, function(err, recipes) {
+      recipes.forEach(function(recipe) {
+        req.user.facebook.bots.forEach(function(bot){
+          console.log(String(recipe._id), String(bot));
+          if(String(recipe._id) === bot) {
+            if(common.indexOf(recipe._id) < 0) {
+              var id = recipe._id;
+              var name = recipe.name;
+              var desc = recipe.desc;
+              common.push({id, name, desc});
+            }
+          }
+        })
+        var id = recipe._id;
+        var name = recipe.name;
+        var desc = recipe.desc;
+        recipesList.push({id, name, desc})
+      })
       res.render('profile.ejs', {
         user: req.user,
-        bots: recipes
+        bots: recipesList,
+        common: common
       })
     })
   });
@@ -53,8 +77,7 @@ module.exports = function(app, passport, trigger) {
         res.redirect('/profile');
       }
       var temp = user.facebook.bots;
-      var finalString = req.params.number + ',' + temp
-      user.facebook.bots = finalString
+      user.facebook.bots.push(req.params.number);
       user.save(function(err) {
         if(err) {
           res.redirect('/profile');
@@ -71,9 +94,7 @@ module.exports = function(app, passport, trigger) {
         console.log(err);
         res.redirect('/profile');
       }
-      var temp = user.facebook.bots;
-      var finalString = temp.replace(req.params.number, '')
-      user.facebook.bots = finalString
+      user.facebook.bots.pull(req.params.number)
       user.save(function(err) {
         if(err) {
           res.redirect('/profile');
@@ -107,14 +128,75 @@ module.exports = function(app, passport, trigger) {
       console.log(req.body.password);
       user.facebook.password = req.body.password;
       user.save(function(err) {
-            if(err)  {
-              return res.redirect('/');
-            }
-            else {
-              return res.redirect('/profile');
+          if(err)  {
+            return res.redirect('/');
+          }
+          else {
+            return res.redirect('/profile');
           }
       });
     });
+  });
+
+  app.get('/start/:id', function(req, res) {
+    User.findOne({'facebook.id': req.user.facebook.id}, function(err, user) {
+      login({email: user.facebook.email, password: user.facebook.password}, function callback(err, api) {
+        var depressionText = '';
+        if(err) return res.redirect('/profile')
+        console.log(user.facebook.email)
+          api.setOptions({
+    listenEvents: true
+  });
+
+  var stopListening = api.listen(function(err, event) {
+    if (err) return console.error(err);
+
+    switch (event.type) {
+      case "message":
+
+        if (!event.body.startsWith('/')) {
+          depressionText += event.body + ' ';
+        }
+        
+
+        if (event.body.startsWith('/weather:')) {
+          var query = event.body.split(':')[1];
+          weatherBot(query, function (result) {
+            api.sendMessage(result, event.threadID);
+          })
+        }
+
+        if (event.body.startsWith('/news:')) {
+          var query = event.body.split(':')[1];
+          newsBot(query, function (data) {
+            api.sendMessage(data.title, event.threadID);
+          })
+        }
+
+        if (event.body === '/news') {
+          newsBot(null, function (data) {
+            api.sendMessage(data.title, event.threadID);
+          })
+        }
+
+        if (event.body === '/sentiment') {
+          var message = 'Your messages: ' + depressionText + '\n';
+
+          depressionBot(depressionText, function (data) {
+            api.sendMessage(data, event.threadID);
+          })
+        }
+
+
+        api.markAsRead(event.threadID, function(err) {
+          if (err) console.log(err);
+        });
+        break;
+    }
+  });
+      });
+    });
+    return res.redirect('/profile')
   });
   
 
@@ -129,6 +211,8 @@ module.exports = function(app, passport, trigger) {
     res.redirect('/');
   });
 
+  app.get('/', function(req, res) {
+  });
 };
 
 function isLoggedIn(req, res, next) {
