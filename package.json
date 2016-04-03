@@ -1,6 +1,9 @@
 {
   "name": "facebot",
   "version": "1.0.0",
+   "engines": {
+    "node": "*"
+  },
   "main": "server.js",
   "dependencies": {
     "async": "^1.5.2",
@@ -37,6 +40,7 @@
     "messenger",
     "bots"
   ],
+  "devDependencies": {},
   "author": "Abhinav Suri",
   "license": "MIT",
   "bugs": {
