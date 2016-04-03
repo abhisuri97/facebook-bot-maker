@@ -11,7 +11,7 @@ var userSchema = mongoose.Schema({
     email     : String,
     name      : String,
     password  : String,
-    bots      : String
+    bots      : []
   },
 
 
