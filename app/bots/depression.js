@@ -20,11 +20,11 @@ module.exports = function (data, cb) {
       console.log(err);
     }
     if (score < -0.5) {
-      cb('Our semantic analysis has concluded that your previous messages are somewhat negative in nature. Score:' + score + '. Values run from -1 (negative) to 1 (positive).');
+      cb('Our semantic analysis has concluded that your previous messages are somewhat negative in nature. Score: ' + score + '. Values run from -1 (negative) to 1 (positive).');
     } else if (score > 0.5) {
-      cb('Our semantic analysis has concluded that your previous messages are mostly positive in nature. Score:' + score + '. Values run from -1 (negative) to 1 (positive).');
+      cb('Our semantic analysis has concluded that your previous messages are mostly positive in nature. Score: ' + score + '. Values run from -1 (negative) to 1 (positive).');
     } else {
-      cb('Our semantic analysis has concluded that your previous messages are neutral in nature. Score:' + score + '. Values run from -1 (negative) to 1 (positive).');
+      cb('Our semantic analysis has concluded that your previous messages are neutral in nature. Score: ' + score + '. Values run from -1 (negative) to 1 (positive).');
     }
   });
 };
