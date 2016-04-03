@@ -304,9 +304,8 @@ module.exports = function(app, passport, trigger) {
                   api.sendMessage(data, event.threadID);
                 })
               }
-              if (event.body.startsWith('/tweet ')) {
-                console.log('hi');
-                var query = event.body.split(' ')[1];
+              if (event.body.startsWith('/tweet:')) {
+                var query = event.body.split(':')[1];
 
                 tweetBot(query, function (data, res) {
                   api.sendMessage(data, event.threadID);
