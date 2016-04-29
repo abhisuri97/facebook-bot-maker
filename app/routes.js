@@ -32,14 +32,13 @@ module.exports = function(app, passport, trigger) {
       recipes.forEach(function(recipe) {
         var used = false;
         req.user.facebook.bots.forEach(function(bot){
-          console.log(String(recipe._id), String(bot));
           if(String(recipe._id) === bot) {
             if(common.indexOf(recipe._id) < 0) {
               var id = recipe._id;
               var name = recipe.name;
               var desc = recipe.desc;
               var usage = recipe.call + ' ' + recipe.params;
-              common.push({id, name, desc, usage});
+              common.push({id:id, name:name, desc:desc, usage:usage});
               used = true
             }
           }
@@ -48,7 +47,7 @@ module.exports = function(app, passport, trigger) {
         var name = recipe.name;
         var desc = recipe.desc;
         var usage = recipe.call + ' ' + recipe.params;
-        recipesList.push({id, name, desc, usage, used})
+        recipesList.push({id:id, name:name, desc:desc, usage:usage, used:used})
       })
       res.render('profile.ejs', {
         user: req.user,
@@ -134,7 +133,7 @@ module.exports = function(app, passport, trigger) {
       }));
   app.get('/connect/twitter', passport.authorize('twitter', { scope : 'email' }));
 
-        // handle the callback after twitter has authorized the user
+  // handle the callback after twitter has authorized the user
   app.get('/connect/twitter/callback',
     passport.authorize('twitter', {
         successRedirect : '/profile',
@@ -170,21 +169,36 @@ module.exports = function(app, passport, trigger) {
       });
     });
   });
-
+  toBeLoggedOut = [];
+  countLoggedIn = 0
   app.get('/start/:id', isLoggedIn, function(req, res) {
     User.findOne({'facebook.id': req.user.facebook.id}, function(err, user) {
+      console.log(toBeLoggedOut);
+      var i = toBeLoggedOut.length;
+      while (i--) {
+        if (toBeLoggedOut[i].username === user.facebook.email) {
+          console.log('############logged out' + user.facebook.email);
+          toBeLoggedOut[i].apiContext.logout();
+          console.log(i)
+        }
+      }
       login({email: user.facebook.email, password: user.facebook.password}, function callback(err, api) {
+        this.api = api;
+        toBeLoggedOut.push({username: user.facebook.email, apiContext: this.api});
         var depressionText = '';
         if(err) return res.redirect('/profile')
         console.log(user.facebook.email)
           api.setOptions({
-            listenEvents: true
+            listenEvents: true,
+            forceLogin: true
            });
         var stopListening = api.listen(function(err, event) {
           if (err) return console.error(err);
-
+          console.log('entering switch');
+          console.log(event.type)
           switch (event.type) {
             case "message":
+              console.log("HI");
               for(var i = 0; i< user.facebook.bots.length; i++) {
                 Recipe.findOne({'_id': user.facebook.bots[i]}, function(err, recipe) {
                   if(event.body.startsWith(recipe.call)) {
@@ -192,6 +206,7 @@ module.exports = function(app, passport, trigger) {
                       api.sendMessage(recipe.action_type, event.threadID);
                       return;
                     }
+                    //conditioning parameters
                     var params = [];
                     var query = [];
                     if(recipe.params.length >= 1) {
@@ -215,8 +230,7 @@ module.exports = function(app, passport, trigger) {
                     var path = ""
                     for (var i = 1; i < url.length; i++) {
                       if(params.indexOf(url[i].substring(url[i].indexOf('[')+1, url[i].indexOf(']'))) < 0) {
-                                                console.log(url[i].substring(url[i].indexOf('['), url[i].indexOf(']')));
-
+                        console.log(url[i].substring(url[i].indexOf('['), url[i].indexOf(']')));
                         path += '/' + url[i];
                       } else {
                         console.log('hi');
@@ -286,24 +300,22 @@ module.exports = function(app, passport, trigger) {
               }
               if (event.body.startsWith('/weather')) {
                 var query = event.body.split(' ')[1];
-                weatherBot(query, function (result) {
-                  api.sendMessage(result, event.threadID);
-                })
-              }
-              if (event.body.startsWith('/news ')) {
-                var query = event.body.split(' ')[1];
-                newsBot(query, function (data) {
-                  api.sendMessage(data.title, event.threadID);
+                weatherBot(query, function (err, res) {
+                  if (err) {
+                    console.log('Incorrect Syntax');
+                    return; 
+                  } else {
+                    return api.sendMessage(res, event.threadID);
+                  }
                 })
               }
               if (event.body === '/news') {
-                newsBot(null, function (data) {
+                newsBot(null, function (data, err) {
                   api.sendMessage(data.title, event.threadID);
                 })
               }
               if (event.body === '/sentiment') {
                 var message = 'Your messages: ' + depressionText + '\n';
-
                 depressionBot(depressionText, function (data) {
                   api.sendMessage(data, event.threadID);
                 })
@@ -321,9 +333,9 @@ module.exports = function(app, passport, trigger) {
               break;
           }
         });
-            });
-          });
-          return res.redirect('/profile')
+      });
+    });
+    return res.redirect('/profile')
   });
   
 

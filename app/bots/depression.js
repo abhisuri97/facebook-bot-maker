@@ -11,7 +11,7 @@ module.exports = function (data, cb) {
   params.text = data;
   alchemy_language.sentiment(params, function (err, response) {
   if (err)
-    console.log('error:', err);
+    cb(null, err);
   else
     console.log(response);
     try {

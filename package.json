@@ -15,6 +15,7 @@
     "express": "~4.0.0",
     "express-session": "~1.0.0",
     "facebook-chat-api": "^1.0.8",
+    "gulp": "^3.9.1",
     "method-override": "~1.0.0",
     "mongoose": "latest",
     "morgan": "~1.0.0",

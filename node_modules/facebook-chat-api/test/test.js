@@ -27,6 +27,7 @@ function checkErr(done){
 
 describe('Login:', function() {
   var api = null;
+  process.on('SIGINT', () => api && !api.logout() && console.log("Logged out :)"));
   var tests = [];
   var stopListening;
   this.timeout(20000);
@@ -43,6 +44,13 @@ describe('Login:', function() {
       api = localAPI;
       stopListening = api.listen(function (err, msg) {
         if (err) throw err;
+        if (msg.type === "message") {
+          assert(msg.senderID && !isNaN(msg.senderID));
+          assert(msg.threadID && !isNaN(msg.threadID));
+          assert(msg.timestamp && !isNaN(msg.timestamp));
+          assert(msg.messageID != null && msg.messageID.length > 0);
+          assert(msg.body != null || msg.attachments.length > 0);
+        }
         // Removes matching function and calls corresponding done
         tests = tests.filter(function(test) {
           return !(test.matcher(msg) && (test.done() || true));
@@ -63,30 +71,52 @@ describe('Login:', function() {
 
   it('should send text message object (user)', function (done){
     var body = "text-msg-obj-" + Date.now();
-    listen(done, function (msg) {
-      return msg.type === 'message' && msg.body === body;
-    });
+    listen(done, msg =>
+      msg.type === 'message' &&
+      msg.body === body &&
+      msg.isGroup === false
+    );
     api.sendMessage({body: body}, userID, checkErr(done));
   });
 
   it('should send sticker message object (user)', function (done){
     var stickerID = '767334526626290';
-    listen(done, function (msg) {
-      return msg.type === 'message' &&
-        msg.attachments.length > 0 &&
-        msg.attachments[0].type === 'sticker' &&
-        msg.attachments[0].stickerID === stickerID;
-    });
+    listen(done, msg =>
+      msg.type === 'message' &&
+      msg.attachments.length > 0 &&
+      msg.attachments[0].type === 'sticker' &&
+      msg.attachments[0].stickerID === stickerID &&
+      msg.isGroup === false
+    );
     api.sendMessage({sticker: stickerID}, userID, checkErr(done));
   });
 
   it('should send basic string (user)', function (done){
     var body = "basic-str-" + Date.now();
-    listen(done, function (msg) {
-      return (msg.type === 'message' && msg.body === body);
-    });
+    listen(done, msg =>
+      msg.type === 'message' &&
+      msg.body === body &&
+      msg.isGroup === false
+    );
     api.sendMessage(body, userID, checkErr(done));
   });
+
+  it('should get thread info (user)', function (done){
+      api.getThreadInfo(userID, (err, info) => {
+        if (err) done(err);
+
+        assert(info.participantIDs != null && info.participantIDs.length > 0);
+        assert(!info.participantIDs.some(isNaN));
+        assert(!info.participantIDs.some(v => v.length == 0));
+        assert(info.name != null && info.name.length > 0);
+        assert(info.messageCount != null && !isNaN(info.messageCount));
+        assert(info.hasOwnProperty('emoji'));
+        assert(info.hasOwnProperty('nicknames'));
+        assert(info.hasOwnProperty('color'));
+        done();
+      });
+  });
+
 
   it('should get the history of the chat (user)', function (done) {
     api.getThreadHistory(userID, 0, 5, Date.now(), function(err, data) {
@@ -99,20 +129,30 @@ describe('Login:', function() {
 
   it('should create a chat', function (done){
     var body = "new-chat-" + Date.now();
-    listen(done, function (msg) {
-      return msg.type === 'message' && msg.body === body;
-    });
+    var inc = 0;
+
+    function doneHack(){
+      if (inc === 1) return done();
+      inc++;
+    }
+
+    listen(doneHack, msg =>
+      msg.type === 'message' && msg.body === body
+    );
     api.sendMessage(body, userIDs, function(err, info){
       checkErr(done)(err);
       groupChatID = info.threadID;
+      doneHack();
     });
   });
 
   it('should send text message object (group)', function (done){
     var body = "text-msg-obj-" + Date.now();
-    listen(done, function (msg) {
-      return msg.type === 'message' && msg.body === body;
-    });
+    listen(done, msg =>
+      msg.type === 'message' &&
+      msg.body === body &&
+      msg.isGroup === true
+    );
     api.sendMessage({body: body}, groupChatID, function(err, info){
       checkErr(done)(err);
       assert(groupChatID === info.threadID);
@@ -121,9 +161,11 @@ describe('Login:', function() {
 
   it('should send basic string (group)', function (done){
     var body = "basic-str-" + Date.now();
-    listen(done, function (msg) {
-      return msg.type === 'message' && msg.body === body;
-    });
+    listen(done, msg =>
+      msg.type === 'message' &&
+      msg.body === body &&
+      msg.isGroup === true
+    );
     api.sendMessage(body, groupChatID, function(err, info) {
       checkErr(done)(err);
       assert(groupChatID === info.threadID);
@@ -202,6 +244,24 @@ describe('Login:', function() {
     api.addUserToGroup(id, groupChatID, function() {});
   });
 
+  it('should get thread info (group)', function (done){
+      api.getThreadInfo(groupChatID, (err, info) => {
+        if (err) done(err);
+
+        assert(info.participantIDs != null && info.participantIDs.length > 0);
+        assert(!info.participantIDs.some(isNaN));
+        assert(!info.participantIDs.some(v => v.length == 0));
+        assert(info.name != null && info.name.length > 0);
+        assert(info.messageCount != null && !isNaN(info.messageCount));
+        assert(info.hasOwnProperty('emoji'));
+        assert(info.hasOwnProperty('nicknames'));
+        assert(info.hasOwnProperty('color'));
+        done();
+      });
+  });
+
+
+
   it('should retrieve a list of threads', function (done) {
     api.getThreadList(0, 20, function(err, res) {
       checkErr(done)(err);
@@ -279,9 +339,10 @@ describe('Login:', function() {
 
   it('should get the list of friends', function (done) {
     api.getFriendsList(function(err, data) {
+      try{
       checkErr(done)(err);
       assert(getType(data) === "Array");
-      data.map(function(v) {
+      data.map(v => {
         assert(getType(v.alternateName) === "String");
         assert(getType(v.firstName) === "String");
         assert(getType(v.gender) === "String");
@@ -290,11 +351,14 @@ describe('Login:', function() {
         assert(getType(v.fullName) === "String");
         assert(getType(v.profilePicture) === "String");
         assert(getType(v.type) === "String");
-        assert(getType(v.profileUrl) === "String");
+        assert(v.hasOwnProperty("profileUrl"));  // This can be null if the account is disabled
         assert(getType(v.vanity) === "String");
         assert(getType(v.isBirthday) === "Boolean");
       })
       done();
+    } catch(e){
+      done(e);
+    }
     });
   });
 
