@@ -10,7 +10,7 @@ module.exports = function (query, cb) {
   weather.find({
     search: query,
     degreeType: 'F'
-  }, function(err, data) {
+  }, function (err, data) {
     if (err) {
       cb(err)
     } else {

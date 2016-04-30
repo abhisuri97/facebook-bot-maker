@@ -1,10 +1,10 @@
-var Twitter = require('twitter');
+var Twitter = require(twitter);
 var User = require('../models/user');
 var config =   
   {
-      'consumerKey'       : 'xzWiUTlSulJAlfnMbI16X60Wk',
-      'consumerSecret'    : 'pEKMP5ZuNHPuoPF44xLC1IBkgUvFLosZPsSAPVD1XJhFnXwTpd',
-      'callbackURL'       : 'http://localhost:8080/auth/twitter/callback'
+      consumerKey       : xzWiUTlSulJAlfnMbI16X60Wk,
+      consumerSecret    : pEKMP5ZuNHPuoPF44xLC1IBkgUvFLosZPsSAPVD1XJhFnXwTpd,
+      callbackURL       : 'http://localhost:8080/auth/twitter/callback'
   }
 
 module.exports = function (message, cb, req) {
@@ -18,7 +18,7 @@ module.exports = function (message, cb, req) {
   console.log(config.consumerSecret);
   console.log(req.user.twitter.token);
   console.log(req.user.twitter.tokenSecret);
-  client.post('statuses/update', {status: message}, function(error, tweet, response) {
+  client.post('statuses/update', {status: message}, function (error, tweet, response) {
     if (error) {
       console.log(error);
     } else {

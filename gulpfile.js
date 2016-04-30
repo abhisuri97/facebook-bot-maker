@@ -6,9 +6,12 @@ var FILES = [
   'app/**/*.js',
   '*.js'
 ];
+var options = {
+  rulePaths: ['.eslint_rules']
+};
 
 gulp.task('eslint', function () {
   return gulp.src(FILES)
-    .pipe(eslint({}))
+    .pipe(eslint(options))
     .pipe(eslint.format());
 });

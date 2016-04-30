@@ -9,29 +9,29 @@ var request = require('request');
 var http = require('http');
 var async = require('async');
 
-module.exports = function(app, passport, trigger) {
-  app.get('/', function(req, res) {
+module.exports = function (app, passport, trigger) {
+  app.get('/', function (req, res) {
     res.render('index.ejs');
   });
 
-  app.get('/login', function(req, res) {
+  app.get('/login', function (req, res) {
     res.render('login.ejs', {
       message: req.flash('loginMessage')
     });
   });
-  app.get('/signup', function(req, res) {
+  app.get('/signup', function (req, res) {
     res.render('signup.ejs', {
       message: req.flash('signupMessage')
     });
   });
 
-  app.get('/profile', isLoggedIn, function(req, res) {
+  app.get('/profile', isLoggedIn, function (req, res) {
     var common = [];
     var recipesList = [];
-    Recipe.find({}, function(err, recipes) {
-      recipes.forEach(function(recipe) {
+    Recipe.find({}, function (err, recipes) {
+      recipes.forEach(function (recipe) {
         var used = false;
-        req.user.facebook.bots.forEach(function(bot){
+        req.user.facebook.bots.forEach(function (bot) {
           if(String(recipe._id) === bot) {
             if(common.indexOf(recipe._id) < 0) {
               var id = recipe._id;
@@ -57,7 +57,7 @@ module.exports = function(app, passport, trigger) {
     })
   });
 
-  app.get('/add-action', isLoggedIn, function(req, res) {
+  app.get('/add-action', isLoggedIn, function (req, res) {
     res.render('addaction.ejs', {
       user: req.user,
       message: req.flash('triggerMessage'),
@@ -65,8 +65,8 @@ module.exports = function(app, passport, trigger) {
     });
   });
 
-  app.post('/add-action', isLoggedIn, function(req, res) {
-    trigger(req, req.body, function(err, pass, trigger) {
+  app.post('/add-action', isLoggedIn, function (req, res) {
+    trigger(req, req.body, function (err, pass, trigger) {
       if (err || (pass === false)) {
         res.redirect('/add-action');
       } else {
@@ -75,17 +75,17 @@ module.exports = function(app, passport, trigger) {
     });
   });
 
-  app.get('/add-bot/:number', isLoggedIn, function(req, res) {
+  app.get('/add-bot/:number', isLoggedIn, function (req, res) {
     User.findOne({
       'facebook.email' : req.user.facebook.email
-    }, function(err, user) {
+    }, function (err, user) {
       if(err) {
         console.log(err);
         res.redirect('/profile');
       }
       var temp = user.facebook.bots;
       user.facebook.bots.push(req.params.number);
-      user.save(function(err) {
+      user.save(function (err) {
         if(err) {
           res.redirect('/profile');
         }
@@ -93,16 +93,16 @@ module.exports = function(app, passport, trigger) {
       });
     })
   });
-  app.get('/remove-bot/:number', isLoggedIn, function(req, res) {
+  app.get('/remove-bot/:number', isLoggedIn, function (req, res) {
     User.findOne({
       'facebook.email' : req.user.facebook.email
-    }, function(err, user) {
+    }, function (err, user) {
       if(err) {
         console.log(err);
         res.redirect('/profile');
       }
       user.facebook.bots.pull(req.params.number)
-      user.save(function(err) {
+      user.save(function (err) {
         if(err) {
           res.redirect('/profile');
         }
@@ -110,7 +110,7 @@ module.exports = function(app, passport, trigger) {
       });
     })
   });
-  app.get('/logout', function(req, res) {
+  app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
   });
@@ -139,19 +139,19 @@ module.exports = function(app, passport, trigger) {
         successRedirect : '/profile',
         failureRedirect : '/'
     }));
-  app.get('/unlink/twitter', function(req, res) {
+  app.get('/unlink/twitter', function (req, res) {
         var user           = req.user;
         user.twitter.token = undefined;
-        user.save(function(err) {
+        user.save(function (err) {
            res.redirect('/profile');
         });
     });
 
 
-  app.post('/signup', function(req, res) {
+  app.post('/signup', function (req, res) {
     User.findOne({
       'facebook.email' : req.body.email
-    }, function(err, user) {
+    }, function (err, user) {
       console.log(req.body.email)
       if(err || !user) {
         return res.redirect('/signup')
@@ -159,20 +159,19 @@ module.exports = function(app, passport, trigger) {
       console.log(user);
       console.log(req.body.password);
       user.facebook.password = req.body.password;
-      user.save(function(err) {
-          if(err)  {
-            return res.redirect('/');
-          }
-          else {
-            return res.redirect('/profile');
-          }
+      user.save(function (err) {
+        if(err) {
+          return res.redirect('/');
+        } else {
+          return res.redirect('/profile');
+        }
       });
     });
   });
   toBeLoggedOut = [];
   countLoggedIn = 0
-  app.get('/start/:id', isLoggedIn, function(req, res) {
-    User.findOne({'facebook.id': req.user.facebook.id}, function(err, user) {
+  app.get('/start/:id', isLoggedIn, function (req, res) {
+    User.findOne({'facebook.id': req.user.facebook.id}, function (err, user) {
       console.log(toBeLoggedOut);
       var i = toBeLoggedOut.length;
       while (i--) {
@@ -192,17 +191,17 @@ module.exports = function(app, passport, trigger) {
             listenEvents: true,
             forceLogin: true
            });
-        var stopListening = api.listen(function(err, event) {
+        var stopListening = api.listen(function (err, event) {
           if (err) return console.error(err);
           console.log('entering switch');
           console.log(event.type)
           switch (event.type) {
-            case "message":
-              console.log("HI");
-              for(var i = 0; i< user.facebook.bots.length; i++) {
-                Recipe.findOne({'_id': user.facebook.bots[i]}, function(err, recipe) {
+            case 'message':
+              console.log('entered message case');
+              for(var i = 0; i < user.facebook.bots.length; i++) {
+                Recipe.findOne({_id: user.facebook.bots[i]}, function (err, recipe) {
                   if(event.body.startsWith(recipe.call)) {
-                    if(recipe.params === "") {
+                    if(recipe.params === '') {
                       api.sendMessage(recipe.action_type, event.threadID);
                       return;
                     }
@@ -227,16 +226,15 @@ module.exports = function(app, passport, trigger) {
                     url = url.split('/');
                     var host = url[0];
                     //
-                    var path = ""
+                    var path = ''
                     for (var i = 1; i < url.length; i++) {
-                      if(params.indexOf(url[i].substring(url[i].indexOf('[')+1, url[i].indexOf(']'))) < 0) {
+                      if(params.indexOf(url[i].substring(url[i].indexOf('[') + 1, url[i].indexOf(']'))) < 0) {
                         console.log(url[i].substring(url[i].indexOf('['), url[i].indexOf(']')));
                         path += '/' + url[i];
                       } else {
-                        console.log('hi');
-                        var queryPos = params.indexOf(url[i].substring(url[i].indexOf('[')+1, url[i].indexOf(']')));
+                        var queryPos = params.indexOf(url[i].substring(url[i].indexOf('[') + 1, url[i].indexOf(']')));
                         console.log(queryPos);
-                        var rep = url[i].substring(url[i].indexOf('[')+1, url[i].indexOf(']'));
+                        var rep = url[i].substring(url[i].indexOf('[') + 1, url[i].indexOf(']'));
                         var finalString = url[i].replace('[' + rep + ']', query[queryPos]);
                         console.log(finalString);
                         path += '/' + finalString;
@@ -252,12 +250,12 @@ module.exports = function(app, passport, trigger) {
                         http.get({
                           host: host,
                           path: '/' + path,
-                        }, function(res) {
+                        }, function (res) {
                           var body = '';
-                          res.on('data', function(d) {
+                          res.on('data', function (d) {
                             body += d;
                           })
-                          res.on('end', function() {
+                          res.on('end', function () {
                             var parsed = JSON.parse(body);
                             console.log(parsed);
                             function getValues(obj, key) {
@@ -327,7 +325,7 @@ module.exports = function(app, passport, trigger) {
                   api.sendMessage(data, event.threadID);
                 }, req);
               }
-              api.markAsRead(event.threadID, function(err) {
+              api.markAsRead(event.threadID, function (err) {
                 if (err) console.log(err);
               });
               break;
@@ -345,12 +343,12 @@ module.exports = function(app, passport, trigger) {
     failureFlash: true
   }));
 
-  app.get('/logout', function(req, res) {
+  app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
   });
 
-  app.get('/', function(req, res) {
+  app.get('/', function (req, res) {
   });
 };
 
