@@ -23,7 +23,7 @@ app.use(bodyParser());
 app.set('view engine', 'ejs');
 
 app.use(session({
-  secret: 'cis197rocks'
+  secret: 'SECRET'
 }));
 app.use(passport.initialize());
 app.use(passport.session());

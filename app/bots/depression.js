@@ -1,8 +1,8 @@
 var watson = require('watson-developer-cloud');
-var config = require('../config.json');
+var config = require('../../config/auth');
 
 var alchemy_language = watson.alchemy_language({
-  api_key: config.alchemy
+  api_key: config.watson.alchemy
 });
 
 var params = {};

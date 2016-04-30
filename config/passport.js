@@ -1,4 +1,3 @@
-var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
 
@@ -10,32 +9,11 @@ module.exports = function(passport) {
   passport.serializeUser(function(user, done) {
     done(null, user.id);
   });
-
   passport.deserializeUser(function(id, done) {
     User.findById(id, function(err, user) {
       done(err, user);
     });
   });
-
-  
-
-  passport.use('local-login', new LocalStrategy({
-    usernameField : 'email',
-    passwordField : 'password',
-    passReqToCallback : true
-  }, function(req, email, password, done) {
-    User.findOne({ 'local.email' : email }, function(err, user) {
-      if (err) 
-        return done(err);
-      if (!user) 
-        return done(null, false, req.flash('loginMessage', 'No User has been found.'));
-      if (!user.validPassword(password))
-        return done(null, false, req.flash('loginMessage', 'Wrong password'));
-
-      return done(null, user);
-    });
-  }));
-
   passport.use(new FacebookStrategy ({
     clientID : configAuth.facebookAuth.clientID,
     clientSecret : configAuth.facebookAuth.clientSecret,
@@ -87,7 +65,6 @@ passport.use(new TwitterStrategy({
         consumerSecret  : configAuth.twitterAuth.consumerSecret,
         callbackURL     : configAuth.twitterAuth.callbackURL,
         passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
-
     },
     function(req, token, tokenSecret, profile, done) {
 
@@ -136,9 +113,7 @@ passport.use(new TwitterStrategy({
                 });
 
             } else {
-                // user already exists and is logged in, we have to link accounts
-                var user                 = req.user; // pull the user out of the session
-
+                var user                 = req.user; 
                 user.twitter.id          = profile.id;
                 user.twitter.token       = token;
                 user.twitter.tokenSecret = tokenSecret;
