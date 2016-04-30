@@ -12,6 +12,7 @@ These bots are fake accounts that are created by users who wish to have a bot. T
 The project can be set up as follows:
 - Run `npm install` to install all the dependencies of the project.
 - Open `auth.js` and replace all the configuration variables with their appropriate text. This project relies upon Facebook, Twitter, and Watson Alchemy API credentials. Additionally a callback URL is used for OAuth requests. 
+- Open `database.js` and replace the mongodb URL with your own mongodb URL
 - Deploy the application to heroku. Fill in the callback URLs in `auth.js` with the appropriate heroku domain name.
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
