@@ -1,0 +1,6 @@
+{
+  "name": "facbeook-bot-maker",
+  "description": "An application to create personal facebook bots with your own addons",
+  "repository": "https://github.com/abhisuri97/facbeook-bot-maker",
+  "keywords": ["node", "express", "static", "facebook", "messenger", "bots"]
+}
