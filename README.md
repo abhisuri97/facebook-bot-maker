@@ -1,6 +1,5 @@
 # facebook-bot-maker
 Make all the facebook bots!
-![Demo of features](http://i.imgur.com/yfBaONg.png)
 This project was created at HackPrinceton 2016 (spring).
 
 #Premise
@@ -19,12 +18,11 @@ The project can be set up as follows:
 #Running the project
 - Run `npm start` or `node server.js` to start the project. This sets up an express server running on Port 8080 if on localhost.
 - On the index page, log in via OAuth with your fake account
-- Add a bot password by clicking the `Add your bot password` button ![Add Password](http://i.imgur.com/mAIPZKw.png)
+- Add a bot password by clicking the `Add your bot password` button
 - **Optional**: Add a twitter account (real account) via OAuth to enable usage of the `/tweet: Message here` command
 
 #Adding Triggers
 Triggers enable the bot to look for certain keywords and respond with results you specify on the **Add a Trigger** page. All triggers created on the system are available to all accounts. 
-![Add Trigger page](http://i.imgur.com/hW59q9b.png)
 - Click on **Add a Trigger**
 - Fill in all the appropriate fields
 - Click the **Request web URL** to initiate a GET or POST request with a URL to send the request to. Specify parameters within the URL itself and Specify Body parameters to send within the 'Body of Request' field. You can also specify a JSON selector to look for and click the `Test` button to see an example response. **The JSON Selector will parse the entire JSON response and return any values with the key matching your input**. 
