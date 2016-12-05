@@ -21,20 +21,20 @@ The project can be set up as follows:
 - Add a bot password by clicking the `Add your bot password` button
 - **Optional**: Add a twitter account (real account) via OAuth to enable usage of the `/tweet: Message here` command
 
-#Adding Triggers
-Triggers enable the bot to look for certain keywords and respond with results you specify on the **Add a Trigger** page. All triggers created on the system are available to all accounts. 
-- Click on **Add a Trigger**
+#Adding Listeners
+Listeners enable the bot to look for certain keywords and respond with results you specify on the **Add a Listener** page. All Listeners created on the system are available to all accounts. 
+- Click on **Add a Listener**
 - Fill in all the appropriate fields
 - Click the **Request web URL** to initiate a GET or POST request with a URL to send the request to. Specify parameters within the URL itself and Specify Body parameters to send within the 'Body of Request' field. You can also specify a JSON selector to look for and click the `Test` button to see an example response. **The JSON Selector will parse the entire JSON response and return any values with the key matching your input**. 
 - The last field is optional and can be used if you wish append anything to your response.
 
-#Adding Triggers/Bots to your Facebot
+#Adding Listeners/Bots to your Facebot
 
-- All bots created as triggers can be added to your bot for increased functionality.
-- Upon adding a trigger to your bot, you must return to the homepage and add this trigger to your bot. 
+- All bots created as Listeners can be added to your bot for increased functionality.
+- Upon adding a Listener to your bot, you must return to the homepage and add this trigger to your bot. 
 - **CLICK THE RESET BOT BUTTON TO UPDATE YOUR BOT/INITIATE YOUR BOT**
 
-#Default Triggers
+#Default Listeners
 - `/weather CITY_NAME` will return the weather
 - `/news` will return the top news story for Google news
 - `/sentiment` will analyze the general mood of the chat
